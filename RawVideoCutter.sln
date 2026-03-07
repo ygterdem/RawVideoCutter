@@ -1,20 +1,35 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35828.75 d17.13
+VisualStudioVersion = 17.13.35828.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RawVideoCutter", "RawVideoCutter\RawVideoCutter.csproj", "{8C13AC38-55A6-452A-9395-2A956CC96F46}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "RawVideoCutterSetup", "RawVideoCutterSetup\RawVideoCutterSetup.vdproj", "{A7EB0022-FF0A-8FBA-6ED2-784D37B002BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8C13AC38-55A6-452A-9395-2A956CC96F46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C13AC38-55A6-452A-9395-2A956CC96F46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C13AC38-55A6-452A-9395-2A956CC96F46}.Debug|x64.ActiveCfg = Debug|x64
+		{8C13AC38-55A6-452A-9395-2A956CC96F46}.Debug|x64.Build.0 = Debug|x64
 		{8C13AC38-55A6-452A-9395-2A956CC96F46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C13AC38-55A6-452A-9395-2A956CC96F46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C13AC38-55A6-452A-9395-2A956CC96F46}.Release|x64.ActiveCfg = Release|Any CPU
+		{8C13AC38-55A6-452A-9395-2A956CC96F46}.Release|x64.Build.0 = Release|Any CPU
+		{A7EB0022-FF0A-8FBA-6ED2-784D37B002BF}.Debug|Any CPU.ActiveCfg = Debug
+		{A7EB0022-FF0A-8FBA-6ED2-784D37B002BF}.Debug|x64.ActiveCfg = Debug
+		{A7EB0022-FF0A-8FBA-6ED2-784D37B002BF}.Debug|x64.Build.0 = Debug
+		{A7EB0022-FF0A-8FBA-6ED2-784D37B002BF}.Release|Any CPU.ActiveCfg = Release
+		{A7EB0022-FF0A-8FBA-6ED2-784D37B002BF}.Release|Any CPU.Build.0 = Release
+		{A7EB0022-FF0A-8FBA-6ED2-784D37B002BF}.Release|x64.ActiveCfg = Release
+		{A7EB0022-FF0A-8FBA-6ED2-784D37B002BF}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

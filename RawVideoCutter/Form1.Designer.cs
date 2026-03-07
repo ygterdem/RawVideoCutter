@@ -13,6 +13,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.videoView = new LibVLCSharp.WinForms.VideoView();
             this.btnOpenVideo = new System.Windows.Forms.Button();
             this.btnPlayPause = new System.Windows.Forms.Button();
@@ -306,6 +307,7 @@
             this.Controls.Add(this.labelAudioTracks);
             this.Controls.Add(this.panelAudioChannels);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Raw Video Cutter";
