@@ -28,14 +28,15 @@ namespace RawVideoCutter
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Core.Initialize(Application.StartupPath);
+
             var options = new[]
             {
-                "--no-video-title-show",
-                "--video-filter=scale",
-                "--scale=0.05"
-            };
+        "--no-video-title-show",
+        "--video-filter=scale",
+        "--scale=0.05"
+    };
 
-            Core.Initialize();
             _libVLC = new LibVLC(options);
             _mediaPlayer = new MediaPlayer(_libVLC);
             videoView.MediaPlayer = _mediaPlayer;
