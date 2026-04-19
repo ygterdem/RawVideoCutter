@@ -51,16 +51,20 @@
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>8.0</LangVersion>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
   </PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-		<PlatformTarget>x64</PlatformTarget>
-		<OutputPath>bin\x64\Release\</OutputPath>
-		<DebugType>pdbonly</DebugType>
-		<Optimize>true</Optimize>
-		<DefineConstants>TRACE</DefineConstants>
-		<ErrorReport>prompt</ErrorReport>
-		<WarningLevel>4</WarningLevel>
-	</PropertyGroup>
+  <ItemGroup>
+    <Content Include="logo.ico" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="LibVLCSharp, Version=3.9.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LibVLCSharp.3.9.3\lib\net471\LibVLCSharp.dll</HintPath>
@@ -188,4 +192,13 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\VideoLAN.LibVLC.Windows.3.0.21\build\VideoLAN.LibVLC.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\VideoLAN.LibVLC.Windows.3.0.21\build\VideoLAN.LibVLC.Windows.targets'))" />
   </Target>
+  <Target Name="CopyVLCFiles" AfterTargets="Build">
+    <ItemGroup>
+      <VLCFiles Include="$(MSBuildProjectDirectory)\..\packages\VideoLAN.LibVLC.Windows.3.0.21\build\x64\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(VLCFiles)" DestinationFiles="@(VLCFiles->'$(OutputPath)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+  <PropertyGroup>
+    <PostBuildEvent>powershell -ExecutionPolicy Bypass -File "$(ProjectDir)trim-vlc-plugins.ps1" -PluginsRoot "$(TargetDir)libvlc\win-x64\plugins"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

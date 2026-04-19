@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,35 +26,54 @@ namespace RawVideoCutter
         private LibVLC _libVLC;
         private MediaPlayer _mediaPlayer;
         private string _inputFilePath;
+        private List<string> _folderVideoPaths = new List<string>();
+        private string _exportFolderPath;
 
         private void Form1_Load(object sender, EventArgs e)
         {
             Core.Initialize(Application.StartupPath);
 
-            var options = new[]
-            {
-        "--no-video-title-show",
-        "--video-filter=scale",
-        "--scale=0.05"
-    };
-
-            _libVLC = new LibVLC(options);
+            _libVLC = new LibVLC("--no-video-title-show");
             _mediaPlayer = new MediaPlayer(_libVLC);
             videoView.MediaPlayer = _mediaPlayer;
+
+            _mediaPlayer.EndReached += (s, e) =>
+            {
+                Task.Run(() => _mediaPlayer.Stop());
+                this.BeginInvoke(new Action(() =>
+                {
+                    btnPlayPause.Text = "▶  Play";
+                    panelSeek.Invalidate();
+                }));
+            };
+
+            var s = Properties.Settings.Default;
+            if (!string.IsNullOrEmpty(s.SourceFolderPath) && Directory.Exists(s.SourceFolderPath))
+            {
+                txtFolderPath.Text = s.SourceFolderPath;
+                LoadFolderVideos(s.SourceFolderPath);
+            }
+            if (!string.IsNullOrEmpty(s.ExportFolderPath) && Directory.Exists(s.ExportFolderPath))
+            {
+                _exportFolderPath = s.ExportFolderPath;
+                txtExportFolder.Text = _exportFolderPath;
+            }
         }
 
-        async private void btnOpenVideo_Click(object sender, EventArgs e)
+        private async void btnOpenVideo_Click(object sender, EventArgs e)
         {
-            
-
             using OpenFileDialog ofd = new OpenFileDialog
             {
                 Filter = "All Video Files|*.ts;*.mp4;*.mkv;*.avi;*.mov;*.wmv;*.flv;*.webm;*.m4v;*.mpeg;*.mpg;*.3gp;*.ogv|All files (*.*)|*.*"
             };
 
             if (ofd.ShowDialog() != DialogResult.OK) return;
+            await LoadVideoAsync(ofd.FileName);
+        }
 
-            _inputFilePath = ofd.FileName;
+        private async Task LoadVideoAsync(string path)
+        {
+            _inputFilePath = path;
             var media = new Media(_libVLC, _inputFilePath, FromType.FromPath);
 
             media.ParsedChanged += (s, args) =>
@@ -78,6 +98,79 @@ namespace RawVideoCutter
 
             await media.Parse(MediaParseOptions.ParseLocal);
             _mediaPlayer.Play(media);
+        }
+
+        private void btnDeleteVideo_Click(object sender, EventArgs e)
+        {
+            int idx = lstVideos.SelectedIndex;
+            if (idx < 0) return;
+
+            string path = _folderVideoPaths[idx];
+            string name = Path.GetFileName(path);
+
+            if (MessageBox.Show($"Delete \"{name}\" from disk?", "Confirm Delete",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                return;
+
+            if (string.Equals(path, _inputFilePath, StringComparison.OrdinalIgnoreCase))
+            {
+                Task.Run(() => _mediaPlayer.Stop());
+                _inputFilePath = null;
+            }
+
+            try
+            {
+                File.Delete(path);
+                _folderVideoPaths.RemoveAt(idx);
+                lstVideos.Items.RemoveAt(idx);
+                labelVideoCount.Text = $"{_folderVideoPaths.Count} video(s) found — double-click to open";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not delete file:\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnBrowseFolder_Click(object sender, EventArgs e)
+        {
+            using var fbd = new FolderBrowserDialog { Description = "Select folder containing raw videos" };
+            if (!string.IsNullOrEmpty(txtFolderPath.Text))
+                fbd.SelectedPath = txtFolderPath.Text;
+
+            if (fbd.ShowDialog() != DialogResult.OK) return;
+
+            txtFolderPath.Text = fbd.SelectedPath;
+            LoadFolderVideos(fbd.SelectedPath);
+
+            Properties.Settings.Default.SourceFolderPath = fbd.SelectedPath;
+            Properties.Settings.Default.Save();
+        }
+
+        private void LoadFolderVideos(string folderPath)
+        {
+            var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ".ts", ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".mpeg", ".mpg", ".3gp", ".ogv"
+            };
+
+            _folderVideoPaths = Directory.GetFiles(folderPath)
+                .Where(f => extensions.Contains(Path.GetExtension(f)))
+                .OrderBy(f => f)
+                .ToList();
+
+            lstVideos.Items.Clear();
+            foreach (var f in _folderVideoPaths)
+                lstVideos.Items.Add(Path.GetFileName(f));
+
+            labelVideoCount.Text = $"{_folderVideoPaths.Count} video(s) found — double-click to open";
+        }
+
+        private async void lstVideos_DoubleClick(object sender, EventArgs e)
+        {
+            if (lstVideos.SelectedIndex < 0) return;
+            await LoadVideoAsync(_folderVideoPaths[lstVideos.SelectedIndex]);
+            tabControl.SelectedTab = tabPageCutter;
         }
 
         private void AudioChannel_CheckedChanged(object sender, EventArgs e)
@@ -107,18 +200,89 @@ namespace RawVideoCutter
         {
             if (_mediaPlayer.Length > 0)
             {
-                label1.Text = "00:00:00";
                 label2.Text = TimeSpan.FromMilliseconds(_mediaPlayer.Length).ToString(@"hh\:mm\:ss");
-                label3.Text = TimeSpan.FromMilliseconds(_mediaPlayer.Time).ToString(@"hh\:mm\:ss");
-                trackBarSeek.Maximum = (int)_mediaPlayer.Length;
-                trackBarSeek.Value = Math.Min((int)_mediaPlayer.Time, trackBarSeek.Maximum);
+                if (!_draggingSeek)
+                {
+                    label3.Text = TimeSpan.FromMilliseconds(_mediaPlayer.Time).ToString(@"hh\:mm\:ss");
+                    panelSeek.Invalidate();
+                }
             }
         }
 
-        private void trackBarSeek_Scroll(object sender, EventArgs e)
+        private bool _draggingSeek;
+
+        private void panelSeek_MouseDown(object sender, MouseEventArgs e)
         {
-            _mediaPlayer.Time = trackBarSeek.Value;
-            label3.Text = trackBarSeek.Value.ToString();
+            if (e.Button != MouseButtons.Left) return;
+            _draggingSeek = true;
+            SeekToX(e.X);
+        }
+
+        private void panelSeek_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_draggingSeek && e.Button == MouseButtons.Left)
+                SeekToX(e.X);
+        }
+
+        private void panelSeek_MouseUp(object sender, MouseEventArgs e)
+        {
+            _draggingSeek = false;
+        }
+
+        private void SeekToX(int x)
+        {
+            if (_mediaPlayer.Length <= 0) return;
+
+            double ratio = Math.Max(0, Math.Min(1, (double)x / panelSeek.Width));
+            long seekTarget = (long)(ratio * _mediaPlayer.Length);
+            label3.Text = TimeSpan.FromMilliseconds(seekTarget).ToString(@"hh\:mm\:ss");
+
+            if (_mediaPlayer.State == VLCState.Stopped || _mediaPlayer.State == VLCState.Ended)
+            {
+                void OnPlaying(object s2, EventArgs e2)
+                {
+                    _mediaPlayer.Playing -= OnPlaying;
+                    _mediaPlayer.Time = seekTarget;
+                    _mediaPlayer.SetPause(true);
+                }
+                _mediaPlayer.Playing += OnPlaying;
+                _mediaPlayer.Play();
+            }
+            else
+            {
+                _mediaPlayer.Time = seekTarget;
+            }
+
+            panelSeek.Invalidate();
+        }
+
+        private void panelSeek_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            int w = panelSeek.Width;
+            int h = panelSeek.Height;
+            int midY = h / 2;
+            const int barH = 4;
+            int barY = midY - barH / 2;
+
+            using var bgBrush = new SolidBrush(Color.FromArgb(80, 80, 80));
+            g.FillRectangle(bgBrush, 0, barY, w, barH);
+
+            if (_mediaPlayer?.Length > 0)
+            {
+                double ratio = Math.Max(0, Math.Min(1, (double)_mediaPlayer.Time / _mediaPlayer.Length));
+                int fillW = (int)(ratio * w);
+
+                using var fgBrush = new SolidBrush(Color.FromArgb(0, 120, 215));
+                g.FillRectangle(fgBrush, 0, barY, fillW, barH);
+
+                const int r = 7;
+                int cx = fillW;
+                using var thumbBrush = new SolidBrush(Color.White);
+                g.FillEllipse(thumbBrush, cx - r, midY - r, r * 2, r * 2);
+            }
         }
 
         private void trackBarVolume_Scroll(object sender, EventArgs e)
@@ -137,19 +301,83 @@ namespace RawVideoCutter
             txtEndTime.Text = TimeSpan.FromMilliseconds(_mediaPlayer.Time).ToString(@"hh\:mm\:ss");
         }
 
-        private async void btnExport_Click(object sender, EventArgs e)
+        private void btnFullscreen_Click(object sender, EventArgs e)
         {
-            using SaveFileDialog sfd = new SaveFileDialog
+            if (_mediaPlayer == null) return;
+
+            var fsForm = new Form
             {
-                Filter = "MP4 File (*.mp4)|*.mp4|Transport Stream (*.ts)|*.ts|MKV File (*.mkv)|*.mkv|AVI File (*.avi)|*.avi|MOV File (*.mov)|*.mov|WebM File (*.webm)|*.webm",
-                FilterIndex = 1,
-                FileName = "cut.mp4"
+                FormBorderStyle = FormBorderStyle.None,
+                WindowState = FormWindowState.Maximized,
+                BackColor = Color.Black,
+                KeyPreview = true
             };
 
-            if (sfd.ShowDialog() != DialogResult.OK) return;
+            // Move the existing VideoView (VLC keeps rendering to the same HWND)
+            var origParent = videoView.Parent;
+            var origDock   = videoView.Dock;
+            var origSize   = videoView.Size;
+            var origLoc    = videoView.Location;
 
-            string outputFile = sfd.FileName;
-            string extension = System.IO.Path.GetExtension(outputFile).ToLower();
+            origParent.Controls.Remove(videoView);
+            videoView.Dock = DockStyle.Fill;
+            fsForm.Controls.Add(videoView);
+
+            fsForm.KeyDown += (s, ke) =>
+            {
+                if (ke.KeyCode == Keys.Escape || ke.KeyCode == Keys.F11)
+                    fsForm.Close();
+            };
+
+            fsForm.FormClosed += (s, fce) =>
+            {
+                fsForm.Controls.Remove(videoView);
+                videoView.Dock   = origDock;
+                videoView.Size   = origSize;
+                videoView.Location = origLoc;
+                origParent.Controls.Add(videoView);
+            };
+
+            fsForm.Show(this);
+        }
+
+        private void btnSelectExportFolder_Click(object sender, EventArgs e)
+        {
+            using var fbd = new FolderBrowserDialog { Description = "Select export destination folder" };
+            if (!string.IsNullOrEmpty(_exportFolderPath))
+                fbd.SelectedPath = _exportFolderPath;
+
+            if (fbd.ShowDialog() != DialogResult.OK) return;
+            _exportFolderPath = fbd.SelectedPath;
+            txtExportFolder.Text = _exportFolderPath;
+
+            Properties.Settings.Default.ExportFolderPath = _exportFolderPath;
+            Properties.Settings.Default.Save();
+        }
+
+        private async void btnExport_Click(object sender, EventArgs e)
+        {
+            string outputFile;
+            string extension;
+
+            if (!string.IsNullOrEmpty(_exportFolderPath) && !string.IsNullOrEmpty(_inputFilePath))
+            {
+                string baseName = Path.GetFileNameWithoutExtension(_inputFilePath);
+                extension = ".mp4";
+                outputFile = Path.Combine(_exportFolderPath, baseName + extension);
+            }
+            else
+            {
+                using SaveFileDialog sfd = new SaveFileDialog
+                {
+                    Filter = "MP4 File (*.mp4)|*.mp4|Transport Stream (*.ts)|*.ts|MKV File (*.mkv)|*.mkv|AVI File (*.avi)|*.avi|MOV File (*.mov)|*.mov|WebM File (*.webm)|*.webm",
+                    FilterIndex = 1,
+                    FileName = "cut.mp4"
+                };
+                if (sfd.ShowDialog() != DialogResult.OK) return;
+                outputFile = sfd.FileName;
+                extension = Path.GetExtension(outputFile).ToLower();
+            }
             string startTime = txtStartTime.Text;
             string endTime = txtEndTime.Text;
 
@@ -166,13 +394,8 @@ namespace RawVideoCutter
 
             string codecArgs = extension switch
             {
-                ".mp4" => "-c:v libx264 -c:a aac -movflags +faststart",
-                ".mkv" => "-c:v libx264 -c:a aac",
-                ".mov" => "-c:v libx264 -c:a aac",
-                ".webm" => "-c:v libvpx-vp9 -c:a libopus",
-                ".avi" => "-c:v libx264 -c:a mp3",
-                ".ts" => "-c copy",
-                _ => "-c:v libx264 -c:a aac"
+                ".mp4" => "-c copy -movflags +faststart",
+                _ => "-c copy"
             };
 
             string arguments =
@@ -191,6 +414,8 @@ namespace RawVideoCutter
 
             progressBarExport.Value = 0;
             btnExport.Enabled = false;
+            labelRemainingTime.Text = "";
+            _exportStopwatch = Stopwatch.StartNew();
 
             var proc = new Process { StartInfo = psi, EnableRaisingEvents = true };
 
@@ -209,9 +434,15 @@ namespace RawVideoCutter
                         if (TimeSpan.TryParse(timeStr, out var current))
                         {
                             double percent = current.TotalSeconds / duration.TotalSeconds * 100;
+                            double elapsed = _exportStopwatch.Elapsed.TotalSeconds;
+                            double remaining = percent > 0 ? elapsed / percent * (100 - percent) : 0;
+                            string remainingStr = remaining > 0
+                                ? $"~{TimeSpan.FromSeconds(remaining):mm\\:ss} remaining"
+                                : "";
                             progressBarExport.Invoke(new Action(() =>
                             {
                                 progressBarExport.Value = Math.Min(100, (int)percent);
+                                labelRemainingTime.Text = remainingStr;
                             }));
                         }
                     }
@@ -223,8 +454,10 @@ namespace RawVideoCutter
 
             await Task.Run(() => proc.WaitForExit());
 
+            _exportStopwatch.Stop();
             btnExport.Enabled = true;
             progressBarExport.Value = 100;
+            labelRemainingTime.Text = "Done";
             MessageBox.Show("Export complete!");
         }
     }
