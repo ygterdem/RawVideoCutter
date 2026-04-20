@@ -60,7 +60,7 @@ namespace RawVideoCutter
             this.panelSidebar.BackColor = System.Drawing.Color.FromArgb(22, 22, 22);
             this.panelSidebar.Location  = new System.Drawing.Point(0, 0);
             this.panelSidebar.Name      = "panelSidebar";
-            this.panelSidebar.Size      = new System.Drawing.Size(294, 760);
+            this.panelSidebar.Size      = new System.Drawing.Size(294, 780);
             this.panelSidebar.TabIndex  = 0;
             this.panelSidebar.Controls.Add(this.labelFolder);
             this.panelSidebar.Controls.Add(this.txtFolderPath);
@@ -112,14 +112,14 @@ namespace RawVideoCutter
             this.lstVideos.ItemHeight        = 20;
             this.lstVideos.Location          = new System.Drawing.Point(0, 62);
             this.lstVideos.Name              = "lstVideos";
-            this.lstVideos.Size              = new System.Drawing.Size(294, 640);
+            this.lstVideos.Size              = new System.Drawing.Size(294, 660);
             this.lstVideos.TabIndex          = 3;
             this.lstVideos.DoubleClick      += new System.EventHandler(this.lstVideos_DoubleClick);
 
             // labelVideoCount
             this.labelVideoCount.Font      = new System.Drawing.Font("Segoe UI", 8.5F);
             this.labelVideoCount.ForeColor = System.Drawing.Color.FromArgb(130, 130, 130);
-            this.labelVideoCount.Location  = new System.Drawing.Point(12, 708);
+            this.labelVideoCount.Location  = new System.Drawing.Point(12, 728);
             this.labelVideoCount.Name      = "labelVideoCount";
             this.labelVideoCount.Size      = new System.Drawing.Size(270, 16);
             this.labelVideoCount.TabIndex  = 4;
@@ -131,7 +131,7 @@ namespace RawVideoCutter
             this.btnDeleteVideo.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
             this.btnDeleteVideo.Font                       = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnDeleteVideo.ForeColor                  = System.Drawing.Color.FromArgb(240, 200, 200);
-            this.btnDeleteVideo.Location                   = new System.Drawing.Point(12, 728);
+            this.btnDeleteVideo.Location                   = new System.Drawing.Point(12, 748);
             this.btnDeleteVideo.Name                       = "btnDeleteVideo";
             this.btnDeleteVideo.Size                       = new System.Drawing.Size(270, 26);
             this.btnDeleteVideo.TabIndex                   = 5;
@@ -143,7 +143,7 @@ namespace RawVideoCutter
             this.panelDivider.BackColor = System.Drawing.Color.FromArgb(55, 55, 55);
             this.panelDivider.Location  = new System.Drawing.Point(294, 0);
             this.panelDivider.Name      = "panelDivider";
-            this.panelDivider.Size      = new System.Drawing.Size(2, 760);
+            this.panelDivider.Size      = new System.Drawing.Size(2, 780);
             this.panelDivider.TabIndex  = 99;
 
             // ── Top bar ──────────────────────────────────────────────────────
@@ -405,9 +405,9 @@ namespace RawVideoCutter
             this.labelRemainingTime.TabIndex  = 33;
             this.labelRemainingTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 
-            this.progressBarExport.Location = new System.Drawing.Point(304, 742);
+            this.progressBarExport.Location = new System.Drawing.Point(304, 762);
             this.progressBarExport.Name     = "progressBarExport";
-            this.progressBarExport.Size     = new System.Drawing.Size(966, 12);
+            this.progressBarExport.Size     = new System.Drawing.Size(966, 14);
             this.progressBarExport.TabIndex = 34;
 
             // ── Timer ────────────────────────────────────────────────────────
@@ -419,7 +419,7 @@ namespace RawVideoCutter
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode       = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor           = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.ClientSize          = new System.Drawing.Size(1280, 760);
+            this.ClientSize          = new System.Drawing.Size(1280, 780);
             this.Font                = new System.Drawing.Font("Segoe UI", 9.5F);
             this.FormBorderStyle     = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.KeyPreview          = true;
