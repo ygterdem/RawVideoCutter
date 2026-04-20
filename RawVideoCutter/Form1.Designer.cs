@@ -422,6 +422,7 @@ namespace RawVideoCutter
             this.BackColor           = System.Drawing.Color.FromArgb(30, 30, 30);
             this.ClientSize          = new System.Drawing.Size(1280, 760);
             this.FormBorderStyle     = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.KeyPreview          = true;
             this.Icon                = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name                = "Form1";
             this.StartPosition       = System.Windows.Forms.FormStartPosition.CenterScreen;
