@@ -15,6 +15,14 @@ namespace RawVideoCutter
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 
+            // Title bar
+            this.panelTitleBar     = new System.Windows.Forms.Panel();
+            this.labelTitle        = new System.Windows.Forms.Label();
+            this.btnWinMin         = new System.Windows.Forms.Button();
+            this.btnWinMax         = new System.Windows.Forms.Button();
+            this.btnWinClose       = new System.Windows.Forms.Button();
+
+            // Sidebar
             this.panelSidebar          = new System.Windows.Forms.Panel();
             this.labelFolder           = new System.Windows.Forms.Label();
             this.txtFolderPath         = new System.Windows.Forms.TextBox();
@@ -23,6 +31,8 @@ namespace RawVideoCutter
             this.labelVideoCount       = new System.Windows.Forms.Label();
             this.btnDeleteVideo        = new System.Windows.Forms.Button();
             this.panelDivider          = new System.Windows.Forms.Panel();
+
+            // Main content
             this.videoView             = new LibVLCSharp.WinForms.VideoView();
             this.btnOpenVideo          = new System.Windows.Forms.Button();
             this.panelAudioChannels    = new System.Windows.Forms.FlowLayoutPanel();
@@ -51,14 +61,83 @@ namespace RawVideoCutter
             this.labelAudioTracks      = new System.Windows.Forms.Label();
             this.timer1                = new System.Windows.Forms.Timer(this.components);
 
+            this.panelTitleBar.SuspendLayout();
             this.panelSidebar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videoView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarVolume)).BeginInit();
             this.SuspendLayout();
 
+            // ── Custom title bar ─────────────────────────────────────────────
+            this.panelTitleBar.BackColor = System.Drawing.Color.FromArgb(18, 18, 18);
+            this.panelTitleBar.Location  = new System.Drawing.Point(0, 0);
+            this.panelTitleBar.Name      = "panelTitleBar";
+            this.panelTitleBar.Size      = new System.Drawing.Size(1280, 32);
+            this.panelTitleBar.TabIndex  = 100;
+            this.panelTitleBar.Controls.Add(this.labelTitle);
+            this.panelTitleBar.Controls.Add(this.btnWinMin);
+            this.panelTitleBar.Controls.Add(this.btnWinMax);
+            this.panelTitleBar.Controls.Add(this.btnWinClose);
+            this.panelTitleBar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panelTitleBar_MouseDown);
+
+            this.labelTitle.AutoSize  = false;
+            this.labelTitle.Font      = new System.Drawing.Font("Segoe UI", 9F);
+            this.labelTitle.ForeColor = System.Drawing.Color.FromArgb(180, 180, 180);
+            this.labelTitle.Location  = new System.Drawing.Point(12, 0);
+            this.labelTitle.Name      = "labelTitle";
+            this.labelTitle.Size      = new System.Drawing.Size(300, 32);
+            this.labelTitle.TabIndex  = 0;
+            this.labelTitle.Text      = "Raw Video Cutter";
+            this.labelTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.labelTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panelTitleBar_MouseDown);
+
+            // Minimize
+            this.btnWinMin.BackColor                  = System.Drawing.Color.Transparent;
+            this.btnWinMin.FlatAppearance.BorderSize  = 0;
+            this.btnWinMin.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(55, 55, 55);
+            this.btnWinMin.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
+            this.btnWinMin.Font                       = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnWinMin.ForeColor                  = System.Drawing.Color.FromArgb(180, 180, 180);
+            this.btnWinMin.Location                   = new System.Drawing.Point(1142, 0);
+            this.btnWinMin.Name                       = "btnWinMin";
+            this.btnWinMin.Size                       = new System.Drawing.Size(46, 32);
+            this.btnWinMin.TabIndex                   = 1;
+            this.btnWinMin.Text                       = "─";
+            this.btnWinMin.UseVisualStyleBackColor     = false;
+            this.btnWinMin.Click                      += new System.EventHandler(this.btnWinMin_Click);
+
+            // Maximize
+            this.btnWinMax.BackColor                  = System.Drawing.Color.Transparent;
+            this.btnWinMax.FlatAppearance.BorderSize  = 0;
+            this.btnWinMax.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(55, 55, 55);
+            this.btnWinMax.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
+            this.btnWinMax.Font                       = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnWinMax.ForeColor                  = System.Drawing.Color.FromArgb(180, 180, 180);
+            this.btnWinMax.Location                   = new System.Drawing.Point(1188, 0);
+            this.btnWinMax.Name                       = "btnWinMax";
+            this.btnWinMax.Size                       = new System.Drawing.Size(46, 32);
+            this.btnWinMax.TabIndex                   = 2;
+            this.btnWinMax.Text                       = "□";
+            this.btnWinMax.UseVisualStyleBackColor     = false;
+            this.btnWinMax.Click                      += new System.EventHandler(this.btnWinMax_Click);
+
+            // Close
+            this.btnWinClose.BackColor                  = System.Drawing.Color.Transparent;
+            this.btnWinClose.FlatAppearance.BorderSize  = 0;
+            this.btnWinClose.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(196, 43, 28);
+            this.btnWinClose.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
+            this.btnWinClose.Font                       = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnWinClose.ForeColor                  = System.Drawing.Color.FromArgb(180, 180, 180);
+            this.btnWinClose.Location                   = new System.Drawing.Point(1234, 0);
+            this.btnWinClose.Name                       = "btnWinClose";
+            this.btnWinClose.Size                       = new System.Drawing.Size(46, 32);
+            this.btnWinClose.TabIndex                   = 3;
+            this.btnWinClose.Text                       = "✕";
+            this.btnWinClose.UseVisualStyleBackColor     = false;
+            this.btnWinClose.Click                      += new System.EventHandler(this.btnWinClose_Click);
+
             // ── Sidebar panel ────────────────────────────────────────────────
             this.panelSidebar.BackColor = System.Drawing.Color.FromArgb(22, 22, 22);
-            this.panelSidebar.Location  = new System.Drawing.Point(0, 0);
+            this.panelSidebar.Location  = new System.Drawing.Point(0, 32);
             this.panelSidebar.Name      = "panelSidebar";
             this.panelSidebar.Size      = new System.Drawing.Size(294, 780);
             this.panelSidebar.TabIndex  = 0;
@@ -69,7 +148,6 @@ namespace RawVideoCutter
             this.panelSidebar.Controls.Add(this.labelVideoCount);
             this.panelSidebar.Controls.Add(this.btnDeleteVideo);
 
-            // labelFolder — uppercase tracking label
             this.labelFolder.Font      = new System.Drawing.Font("Segoe UI", 7.5F, System.Drawing.FontStyle.Bold);
             this.labelFolder.ForeColor = System.Drawing.Color.FromArgb(140, 140, 140);
             this.labelFolder.Location  = new System.Drawing.Point(12, 14);
@@ -78,18 +156,16 @@ namespace RawVideoCutter
             this.labelFolder.TabIndex  = 0;
             this.labelFolder.Text      = "SOURCE FOLDER";
 
-            // txtFolderPath
-            this.txtFolderPath.BackColor    = System.Drawing.Color.FromArgb(38, 38, 38);
-            this.txtFolderPath.BorderStyle  = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtFolderPath.Font         = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtFolderPath.ForeColor    = System.Drawing.Color.FromArgb(210, 210, 210);
-            this.txtFolderPath.Location     = new System.Drawing.Point(12, 32);
-            this.txtFolderPath.Name         = "txtFolderPath";
-            this.txtFolderPath.ReadOnly     = true;
-            this.txtFolderPath.Size         = new System.Drawing.Size(198, 23);
-            this.txtFolderPath.TabIndex     = 1;
+            this.txtFolderPath.BackColor   = System.Drawing.Color.FromArgb(38, 38, 38);
+            this.txtFolderPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtFolderPath.Font        = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtFolderPath.ForeColor   = System.Drawing.Color.FromArgb(210, 210, 210);
+            this.txtFolderPath.Location    = new System.Drawing.Point(12, 32);
+            this.txtFolderPath.Name        = "txtFolderPath";
+            this.txtFolderPath.ReadOnly    = true;
+            this.txtFolderPath.Size        = new System.Drawing.Size(198, 23);
+            this.txtFolderPath.TabIndex    = 1;
 
-            // btnBrowseFolder
             this.btnBrowseFolder.BackColor                  = System.Drawing.Color.FromArgb(55, 55, 55);
             this.btnBrowseFolder.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(75, 75, 75);
             this.btnBrowseFolder.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
@@ -103,7 +179,6 @@ namespace RawVideoCutter
             this.btnBrowseFolder.UseVisualStyleBackColor    = false;
             this.btnBrowseFolder.Click                     += new System.EventHandler(this.btnBrowseFolder_Click);
 
-            // lstVideos — Segoe UI for readable filenames
             this.lstVideos.BackColor         = System.Drawing.Color.FromArgb(32, 32, 32);
             this.lstVideos.BorderStyle       = System.Windows.Forms.BorderStyle.None;
             this.lstVideos.Font              = new System.Drawing.Font("Segoe UI", 9.5F);
@@ -116,7 +191,6 @@ namespace RawVideoCutter
             this.lstVideos.TabIndex          = 3;
             this.lstVideos.DoubleClick      += new System.EventHandler(this.lstVideos_DoubleClick);
 
-            // labelVideoCount
             this.labelVideoCount.Font      = new System.Drawing.Font("Segoe UI", 8.5F);
             this.labelVideoCount.ForeColor = System.Drawing.Color.FromArgb(130, 130, 130);
             this.labelVideoCount.Location  = new System.Drawing.Point(12, 728);
@@ -125,7 +199,6 @@ namespace RawVideoCutter
             this.labelVideoCount.TabIndex  = 4;
             this.labelVideoCount.Text      = "Select a folder to browse videos";
 
-            // btnDeleteVideo
             this.btnDeleteVideo.BackColor                  = System.Drawing.Color.FromArgb(100, 28, 28);
             this.btnDeleteVideo.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(130, 38, 38);
             this.btnDeleteVideo.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
@@ -141,19 +214,18 @@ namespace RawVideoCutter
 
             // ── Divider ──────────────────────────────────────────────────────
             this.panelDivider.BackColor = System.Drawing.Color.FromArgb(55, 55, 55);
-            this.panelDivider.Location  = new System.Drawing.Point(294, 0);
+            this.panelDivider.Location  = new System.Drawing.Point(294, 32);
             this.panelDivider.Name      = "panelDivider";
             this.panelDivider.Size      = new System.Drawing.Size(2, 780);
             this.panelDivider.TabIndex  = 99;
 
             // ── Top bar ──────────────────────────────────────────────────────
-            // btnOpenVideo
             this.btnOpenVideo.BackColor                  = System.Drawing.Color.FromArgb(50, 50, 50);
             this.btnOpenVideo.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(72, 72, 72);
             this.btnOpenVideo.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
             this.btnOpenVideo.Font                       = new System.Drawing.Font("Segoe UI", 9F);
             this.btnOpenVideo.ForeColor                  = System.Drawing.Color.FromArgb(210, 210, 210);
-            this.btnOpenVideo.Location                   = new System.Drawing.Point(304, 10);
+            this.btnOpenVideo.Location                   = new System.Drawing.Point(304, 42);
             this.btnOpenVideo.Name                       = "btnOpenVideo";
             this.btnOpenVideo.Size                       = new System.Drawing.Size(110, 28);
             this.btnOpenVideo.TabIndex                   = 10;
@@ -161,30 +233,27 @@ namespace RawVideoCutter
             this.btnOpenVideo.UseVisualStyleBackColor    = false;
             this.btnOpenVideo.Click                     += new System.EventHandler(this.btnOpenVideo_Click);
 
-            // panelAudioChannels
             this.panelAudioChannels.AutoSize  = true;
             this.panelAudioChannels.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
             this.panelAudioChannels.Font      = new System.Drawing.Font("Segoe UI", 9F);
             this.panelAudioChannels.ForeColor = System.Drawing.Color.FromArgb(210, 210, 210);
-            this.panelAudioChannels.Location  = new System.Drawing.Point(424, 10);
+            this.panelAudioChannels.Location  = new System.Drawing.Point(424, 42);
             this.panelAudioChannels.Name      = "panelAudioChannels";
             this.panelAudioChannels.Size      = new System.Drawing.Size(622, 30);
             this.panelAudioChannels.TabIndex  = 11;
 
-            // labelAudioTracks (hidden)
             this.labelAudioTracks.Location = new System.Drawing.Point(0, 0);
             this.labelAudioTracks.Name     = "labelAudioTracks";
             this.labelAudioTracks.Size     = new System.Drawing.Size(1, 1);
             this.labelAudioTracks.TabIndex = 90;
             this.labelAudioTracks.Visible  = false;
 
-            // btnFullscreen
             this.btnFullscreen.BackColor                  = System.Drawing.Color.FromArgb(50, 50, 50);
             this.btnFullscreen.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(72, 72, 72);
             this.btnFullscreen.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
             this.btnFullscreen.Font                       = new System.Drawing.Font("Segoe UI", 9F);
             this.btnFullscreen.ForeColor                  = System.Drawing.Color.FromArgb(210, 210, 210);
-            this.btnFullscreen.Location                   = new System.Drawing.Point(1154, 10);
+            this.btnFullscreen.Location                   = new System.Drawing.Point(1154, 42);
             this.btnFullscreen.Name                       = "btnFullscreen";
             this.btnFullscreen.Size                       = new System.Drawing.Size(116, 28);
             this.btnFullscreen.TabIndex                   = 12;
@@ -194,7 +263,7 @@ namespace RawVideoCutter
 
             // ── Video view ───────────────────────────────────────────────────
             this.videoView.BackColor   = System.Drawing.Color.Black;
-            this.videoView.Location    = new System.Drawing.Point(304, 46);
+            this.videoView.Location    = new System.Drawing.Point(304, 78);
             this.videoView.MediaPlayer = null;
             this.videoView.Name        = "videoView";
             this.videoView.Size        = new System.Drawing.Size(966, 484);
@@ -203,7 +272,7 @@ namespace RawVideoCutter
             // ── Seek bar ─────────────────────────────────────────────────────
             this.panelSeek.BackColor  = System.Drawing.Color.FromArgb(30, 30, 30);
             this.panelSeek.Cursor     = System.Windows.Forms.Cursors.Hand;
-            this.panelSeek.Location   = new System.Drawing.Point(304, 538);
+            this.panelSeek.Location   = new System.Drawing.Point(304, 570);
             this.panelSeek.Name       = "panelSeek";
             this.panelSeek.Size       = new System.Drawing.Size(966, 36);
             this.panelSeek.TabIndex   = 14;
@@ -212,27 +281,27 @@ namespace RawVideoCutter
             this.panelSeek.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panelSeek_MouseMove);
             this.panelSeek.MouseUp   += new System.Windows.Forms.MouseEventHandler(this.panelSeek_MouseUp);
 
-            // ── Time labels — Consolas for fixed-width digit alignment ────────
-            this.label1.Font      = new System.Drawing.Font("Consolas", 10.5F, System.Drawing.FontStyle.Regular);
+            // ── Time labels ──────────────────────────────────────────────────
+            this.label1.Font      = new System.Drawing.Font("Consolas", 10.5F);
             this.label1.ForeColor = System.Drawing.Color.FromArgb(0, 140, 255);
-            this.label1.Location  = new System.Drawing.Point(304, 578);
+            this.label1.Location  = new System.Drawing.Point(304, 610);
             this.label1.Name      = "label1";
             this.label1.Size      = new System.Drawing.Size(90, 20);
             this.label1.TabIndex  = 15;
             this.label1.Text      = "00:00:00";
 
-            this.label3.Font      = new System.Drawing.Font("Consolas", 10.5F, System.Drawing.FontStyle.Regular);
+            this.label3.Font      = new System.Drawing.Font("Consolas", 10.5F);
             this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location  = new System.Drawing.Point(742, 578);
+            this.label3.Location  = new System.Drawing.Point(742, 610);
             this.label3.Name      = "label3";
             this.label3.Size      = new System.Drawing.Size(90, 20);
             this.label3.TabIndex  = 16;
             this.label3.Text      = "00:00:00";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
-            this.label2.Font      = new System.Drawing.Font("Consolas", 10.5F, System.Drawing.FontStyle.Regular);
+            this.label2.Font      = new System.Drawing.Font("Consolas", 10.5F);
             this.label2.ForeColor = System.Drawing.Color.FromArgb(220, 80, 80);
-            this.label2.Location  = new System.Drawing.Point(1180, 578);
+            this.label2.Location  = new System.Drawing.Point(1180, 610);
             this.label2.Name      = "label2";
             this.label2.Size      = new System.Drawing.Size(90, 20);
             this.label2.TabIndex  = 17;
@@ -242,14 +311,14 @@ namespace RawVideoCutter
             // ── Volume ───────────────────────────────────────────────────────
             this.label4.Font      = new System.Drawing.Font("Segoe UI", 9F);
             this.label4.ForeColor = System.Drawing.Color.FromArgb(155, 155, 155);
-            this.label4.Location  = new System.Drawing.Point(304, 607);
+            this.label4.Location  = new System.Drawing.Point(304, 639);
             this.label4.Name      = "label4";
             this.label4.Size      = new System.Drawing.Size(52, 18);
             this.label4.TabIndex  = 18;
             this.label4.Text      = "Volume";
 
             this.trackBarVolume.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.trackBarVolume.Location  = new System.Drawing.Point(360, 599);
+            this.trackBarVolume.Location  = new System.Drawing.Point(360, 631);
             this.trackBarVolume.Maximum   = 100;
             this.trackBarVolume.Name      = "trackBarVolume";
             this.trackBarVolume.Size      = new System.Drawing.Size(130, 45);
@@ -259,7 +328,7 @@ namespace RawVideoCutter
 
             this.labelVolVal.Font      = new System.Drawing.Font("Consolas", 10F);
             this.labelVolVal.ForeColor = System.Drawing.Color.FromArgb(190, 190, 190);
-            this.labelVolVal.Location  = new System.Drawing.Point(496, 607);
+            this.labelVolVal.Location  = new System.Drawing.Point(496, 639);
             this.labelVolVal.Name      = "labelVolVal";
             this.labelVolVal.Size      = new System.Drawing.Size(40, 20);
             this.labelVolVal.TabIndex  = 20;
@@ -271,7 +340,7 @@ namespace RawVideoCutter
             this.btnPlayPause.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
             this.btnPlayPause.Font                       = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnPlayPause.ForeColor                  = System.Drawing.Color.White;
-            this.btnPlayPause.Location                   = new System.Drawing.Point(727, 599);
+            this.btnPlayPause.Location                   = new System.Drawing.Point(727, 631);
             this.btnPlayPause.Name                       = "btnPlayPause";
             this.btnPlayPause.Size                       = new System.Drawing.Size(120, 32);
             this.btnPlayPause.TabIndex                   = 21;
@@ -282,7 +351,7 @@ namespace RawVideoCutter
             // ── Cut start ────────────────────────────────────────────────────
             this.labelStartHint.Font      = new System.Drawing.Font("Segoe UI", 7.5F, System.Drawing.FontStyle.Bold);
             this.labelStartHint.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
-            this.labelStartHint.Location  = new System.Drawing.Point(304, 645);
+            this.labelStartHint.Location  = new System.Drawing.Point(304, 677);
             this.labelStartHint.Name      = "labelStartHint";
             this.labelStartHint.Size      = new System.Drawing.Size(80, 14);
             this.labelStartHint.TabIndex  = 22;
@@ -292,7 +361,7 @@ namespace RawVideoCutter
             this.txtStartTime.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtStartTime.Font        = new System.Drawing.Font("Consolas", 11F);
             this.txtStartTime.ForeColor   = System.Drawing.Color.White;
-            this.txtStartTime.Location    = new System.Drawing.Point(304, 661);
+            this.txtStartTime.Location    = new System.Drawing.Point(304, 693);
             this.txtStartTime.Name        = "txtStartTime";
             this.txtStartTime.Size        = new System.Drawing.Size(104, 24);
             this.txtStartTime.TabIndex    = 23;
@@ -302,7 +371,7 @@ namespace RawVideoCutter
             this.btnSetStart.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
             this.btnSetStart.Font                       = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnSetStart.ForeColor                  = System.Drawing.Color.FromArgb(50, 210, 90);
-            this.btnSetStart.Location                   = new System.Drawing.Point(414, 660);
+            this.btnSetStart.Location                   = new System.Drawing.Point(414, 692);
             this.btnSetStart.Name                       = "btnSetStart";
             this.btnSetStart.Size                       = new System.Drawing.Size(80, 26);
             this.btnSetStart.TabIndex                   = 24;
@@ -316,7 +385,7 @@ namespace RawVideoCutter
             this.btnExport.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
             this.btnExport.Font                       = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnExport.ForeColor                  = System.Drawing.Color.White;
-            this.btnExport.Location                   = new System.Drawing.Point(697, 651);
+            this.btnExport.Location                   = new System.Drawing.Point(697, 683);
             this.btnExport.Name                       = "btnExport";
             this.btnExport.Size                       = new System.Drawing.Size(180, 38);
             this.btnExport.TabIndex                   = 25;
@@ -327,7 +396,7 @@ namespace RawVideoCutter
             // ── Cut end ──────────────────────────────────────────────────────
             this.labelEndHint.Font      = new System.Drawing.Font("Segoe UI", 7.5F, System.Drawing.FontStyle.Bold);
             this.labelEndHint.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
-            this.labelEndHint.Location  = new System.Drawing.Point(1090, 645);
+            this.labelEndHint.Location  = new System.Drawing.Point(1090, 677);
             this.labelEndHint.Name      = "labelEndHint";
             this.labelEndHint.Size      = new System.Drawing.Size(80, 14);
             this.labelEndHint.TabIndex  = 26;
@@ -337,7 +406,7 @@ namespace RawVideoCutter
             this.txtEndTime.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtEndTime.Font        = new System.Drawing.Font("Consolas", 11F);
             this.txtEndTime.ForeColor   = System.Drawing.Color.White;
-            this.txtEndTime.Location    = new System.Drawing.Point(1090, 661);
+            this.txtEndTime.Location    = new System.Drawing.Point(1090, 693);
             this.txtEndTime.Name        = "txtEndTime";
             this.txtEndTime.Size        = new System.Drawing.Size(104, 24);
             this.txtEndTime.TabIndex    = 27;
@@ -347,7 +416,7 @@ namespace RawVideoCutter
             this.btnSetEnd.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
             this.btnSetEnd.Font                       = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnSetEnd.ForeColor                  = System.Drawing.Color.FromArgb(220, 80, 80);
-            this.btnSetEnd.Location                   = new System.Drawing.Point(1200, 660);
+            this.btnSetEnd.Location                   = new System.Drawing.Point(1200, 692);
             this.btnSetEnd.Name                       = "btnSetEnd";
             this.btnSetEnd.Size                       = new System.Drawing.Size(70, 26);
             this.btnSetEnd.TabIndex                   = 28;
@@ -358,7 +427,7 @@ namespace RawVideoCutter
             // ── Export folder ────────────────────────────────────────────────
             this.labelExportFolder.Font      = new System.Drawing.Font("Segoe UI", 7.5F, System.Drawing.FontStyle.Bold);
             this.labelExportFolder.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
-            this.labelExportFolder.Location  = new System.Drawing.Point(304, 700);
+            this.labelExportFolder.Location  = new System.Drawing.Point(304, 732);
             this.labelExportFolder.Name      = "labelExportFolder";
             this.labelExportFolder.Size      = new System.Drawing.Size(80, 14);
             this.labelExportFolder.TabIndex  = 29;
@@ -368,7 +437,7 @@ namespace RawVideoCutter
             this.txtExportFolder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtExportFolder.Font        = new System.Drawing.Font("Segoe UI", 9.5F);
             this.txtExportFolder.ForeColor   = System.Drawing.Color.FromArgb(160, 160, 160);
-            this.txtExportFolder.Location    = new System.Drawing.Point(304, 716);
+            this.txtExportFolder.Location    = new System.Drawing.Point(304, 748);
             this.txtExportFolder.Name        = "txtExportFolder";
             this.txtExportFolder.ReadOnly    = true;
             this.txtExportFolder.Size        = new System.Drawing.Size(778, 23);
@@ -380,7 +449,7 @@ namespace RawVideoCutter
             this.btnSelectExportFolder.FlatStyle                  = System.Windows.Forms.FlatStyle.Flat;
             this.btnSelectExportFolder.Font                       = new System.Drawing.Font("Segoe UI", 9F);
             this.btnSelectExportFolder.ForeColor                  = System.Drawing.Color.FromArgb(210, 210, 210);
-            this.btnSelectExportFolder.Location                   = new System.Drawing.Point(1088, 715);
+            this.btnSelectExportFolder.Location                   = new System.Drawing.Point(1088, 747);
             this.btnSelectExportFolder.Name                       = "btnSelectExportFolder";
             this.btnSelectExportFolder.Size                       = new System.Drawing.Size(182, 25);
             this.btnSelectExportFolder.TabIndex                   = 31;
@@ -391,21 +460,21 @@ namespace RawVideoCutter
             // ── Progress ─────────────────────────────────────────────────────
             this.labelExportProgress.Font      = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
             this.labelExportProgress.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
-            this.labelExportProgress.Location  = new System.Drawing.Point(304, 746);
+            this.labelExportProgress.Location  = new System.Drawing.Point(304, 778);
             this.labelExportProgress.Name      = "labelExportProgress";
-            this.labelExportProgress.Size      = new System.Drawing.Size(110, 14);
+            this.labelExportProgress.Size      = new System.Drawing.Size(120, 14);
             this.labelExportProgress.TabIndex  = 32;
             this.labelExportProgress.Text      = "EXPORT PROGRESS";
 
             this.labelRemainingTime.Font      = new System.Drawing.Font("Segoe UI", 9F);
             this.labelRemainingTime.ForeColor = System.Drawing.Color.FromArgb(155, 155, 155);
-            this.labelRemainingTime.Location  = new System.Drawing.Point(1050, 746);
+            this.labelRemainingTime.Location  = new System.Drawing.Point(1050, 778);
             this.labelRemainingTime.Name      = "labelRemainingTime";
             this.labelRemainingTime.Size      = new System.Drawing.Size(220, 14);
             this.labelRemainingTime.TabIndex  = 33;
             this.labelRemainingTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 
-            this.progressBarExport.Location = new System.Drawing.Point(304, 762);
+            this.progressBarExport.Location = new System.Drawing.Point(304, 794);
             this.progressBarExport.Name     = "progressBarExport";
             this.progressBarExport.Size     = new System.Drawing.Size(966, 14);
             this.progressBarExport.TabIndex = 34;
@@ -419,9 +488,9 @@ namespace RawVideoCutter
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode       = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor           = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.ClientSize          = new System.Drawing.Size(1280, 780);
+            this.ClientSize          = new System.Drawing.Size(1280, 812);
             this.Font                = new System.Drawing.Font("Segoe UI", 9.5F);
-            this.FormBorderStyle     = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle     = System.Windows.Forms.FormBorderStyle.None;
             this.KeyPreview          = true;
             this.Icon                = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name                = "Form1";
@@ -429,6 +498,7 @@ namespace RawVideoCutter
             this.Text                = "Raw Video Cutter";
             this.Load               += new System.EventHandler(this.Form1_Load);
 
+            this.Controls.Add(this.panelTitleBar);
             this.Controls.Add(this.panelSidebar);
             this.Controls.Add(this.panelDivider);
             this.Controls.Add(this.btnOpenVideo);
@@ -458,11 +528,19 @@ namespace RawVideoCutter
             this.Controls.Add(this.labelRemainingTime);
             this.Controls.Add(this.progressBarExport);
 
+            this.panelTitleBar.ResumeLayout(false);
             this.panelSidebar.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.videoView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarVolume)).EndInit();
             this.ResumeLayout(false);
         }
+
+        // Title bar
+        private System.Windows.Forms.Panel  panelTitleBar;
+        private System.Windows.Forms.Label  labelTitle;
+        private System.Windows.Forms.Button btnWinMin;
+        private System.Windows.Forms.Button btnWinMax;
+        private System.Windows.Forms.Button btnWinClose;
 
         private System.Windows.Forms.Panel   panelSidebar;
         private System.Windows.Forms.Panel   panelDivider;

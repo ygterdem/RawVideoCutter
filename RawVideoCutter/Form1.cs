@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,6 +19,56 @@ namespace RawVideoCutter
         public Form1()
         {
             InitializeComponent();
+        }
+
+        // ── Win32 for borderless drag ─────────────────────────────────────────
+        [DllImport("user32.dll")] private static extern int  SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        [DllImport("user32.dll")] private static extern bool ReleaseCapture();
+
+        // Drop shadow on borderless form
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                const int CS_DROPSHADOW = 0x20000;
+                var cp = base.CreateParams;
+                cp.ClassStyle |= CS_DROPSHADOW;
+                return cp;
+            }
+        }
+
+        // Subtle 1px border painted around the window edge
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            using var pen = new Pen(Color.FromArgb(65, 65, 65), 1);
+            e.Graphics.DrawRectangle(pen, 0, 0, Width - 1, Height - 1);
+        }
+
+        // ── Custom title bar ──────────────────────────────────────────────────
+        private void panelTitleBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, 0xA1 /*WM_NCLBUTTONDOWN*/, 0x2 /*HTCAPTION*/, 0);
+            }
+        }
+
+        private void btnWinMin_Click(object sender, EventArgs e)   => WindowState = FormWindowState.Minimized;
+        private void btnWinClose_Click(object sender, EventArgs e) => Close();
+        private void btnWinMax_Click(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Maximized)
+            {
+                WindowState    = FormWindowState.Normal;
+                btnWinMax.Text = "□";
+            }
+            else
+            {
+                WindowState    = FormWindowState.Maximized;
+                btnWinMax.Text = "❐";
+            }
         }
 
         // ── Core fields ───────────────────────────────────────────────────────
