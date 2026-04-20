@@ -71,6 +71,24 @@ namespace RawVideoCutter
             }
         }
 
+        // Keep centred controls repositioned whenever the window is resized
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            CenterContentControls();
+        }
+
+        private void CenterContentControls()
+        {
+            // Content area starts immediately after the sidebar divider (x = 296)
+            int contentStart = panelSidebar.Right + panelDivider.Width;
+            int centerX      = contentStart + (ClientSize.Width - contentStart) / 2;
+
+            btnPlayPause.Left = centerX - btnPlayPause.Width / 2;
+            btnExport.Left    = centerX - btnExport.Width  / 2;
+            label3.Left       = centerX - label3.Width     / 2;
+        }
+
         // ── Core fields ───────────────────────────────────────────────────────
         private Stopwatch _exportStopwatch;
         private LibVLC _libVLC;
@@ -131,6 +149,14 @@ namespace RawVideoCutter
 
             switch (keyData)
             {
+                case Keys.Escape:
+                    if (_isFullscreen) { ExitFullscreen(); return true; }
+                    break;
+
+                case Keys.F11:
+                    if (_isFullscreen) ExitFullscreen(); else EnterFullscreen();
+                    return true;
+
                 case Keys.Space:
                     btnPlayPause_Click(null, EventArgs.Empty);
                     return true;
@@ -535,43 +561,45 @@ namespace RawVideoCutter
         }
 
         // ── Fullscreen ────────────────────────────────────────────────────────
+        private bool  _isFullscreen;
+        private Point _savedVideoLocation;
+        private Size  _savedVideoSize;
+
         private void btnFullscreen_Click(object sender, EventArgs e)
         {
-            if (_mediaPlayer == null) return;
+            if (_isFullscreen) ExitFullscreen();
+            else               EnterFullscreen();
+        }
 
-            var fsForm = new Form
-            {
-                FormBorderStyle = FormBorderStyle.None,
-                WindowState     = FormWindowState.Maximized,
-                BackColor       = Color.Black,
-                KeyPreview      = true
-            };
+        private void EnterFullscreen()
+        {
+            _savedVideoLocation = videoView.Location;
+            _savedVideoSize     = videoView.Size;
 
-            var origParent = videoView.Parent;
-            var origDock   = videoView.Dock;
-            var origSize   = videoView.Size;
-            var origLoc    = videoView.Location;
+            // Hide every control except the video itself
+            foreach (Control c in Controls)
+                if (c != videoView) c.Visible = false;
 
-            origParent.Controls.Remove(videoView);
-            videoView.Dock = DockStyle.Fill;
-            fsForm.Controls.Add(videoView);
+            WindowState = FormWindowState.Maximized;
 
-            fsForm.KeyDown += (s, ke) =>
-            {
-                if (ke.KeyCode == Keys.Escape || ke.KeyCode == Keys.F11)
-                    fsForm.Close();
-            };
+            videoView.Location = Point.Empty;
+            videoView.Size     = ClientSize;
+            videoView.BringToFront();
 
-            fsForm.FormClosed += (s, fce) =>
-            {
-                fsForm.Controls.Remove(videoView);
-                videoView.Dock     = origDock;
-                videoView.Size     = origSize;
-                videoView.Location = origLoc;
-                origParent.Controls.Add(videoView);
-            };
+            _isFullscreen = true;
+        }
 
-            fsForm.Show(this);
+        private void ExitFullscreen()
+        {
+            WindowState = FormWindowState.Normal;
+
+            videoView.Location = _savedVideoLocation;
+            videoView.Size     = _savedVideoSize;
+
+            foreach (Control c in Controls)
+                c.Visible = true;
+
+            _isFullscreen = false;
         }
 
         // ── Export folder ─────────────────────────────────────────────────────
