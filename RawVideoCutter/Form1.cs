@@ -170,7 +170,6 @@ namespace RawVideoCutter
         {
             if (lstVideos.SelectedIndex < 0) return;
             await LoadVideoAsync(_folderVideoPaths[lstVideos.SelectedIndex]);
-            tabControl.SelectedTab = tabPageCutter;
         }
 
         private void AudioChannel_CheckedChanged(object sender, EventArgs e)
