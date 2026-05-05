@@ -96,6 +96,7 @@ namespace RawVideoCutter
         private string _inputFilePath;
         private List<string> _folderVideoPaths = new List<string>();
         private string _exportFolderPath;
+        private string _lastExportedFile;   // path of the most recently exported clip
 
         // ── Seek / markers ────────────────────────────────────────────────────
         private bool _draggingSeek;
@@ -560,6 +561,117 @@ namespace RawVideoCutter
             panelSeek.Invalidate();
         }
 
+        // ── Discord split ─────────────────────────────────────────────────────
+        private void chkSplitParts_CheckedChanged(object sender, EventArgs e)
+        {
+            bool on = chkSplitParts.Checked;
+            numSplitMB.Enabled     = on;
+            labelSplitUnit.Enabled = on;
+            // chkReencode is always available — applies to the initial export too
+        }
+
+        // Runs ffmpeg with the given arguments, appends stderr to errBuf, returns exit code.
+        private async Task<int> RunFfmpegAsync(string arguments, System.Text.StringBuilder errBuf)
+        {
+            errBuf.Clear();
+            var psi = new ProcessStartInfo
+            {
+                FileName              = "ffmpeg.exe",
+                Arguments             = arguments,
+                UseShellExecute       = false,
+                RedirectStandardError = true,
+                CreateNoWindow        = true
+            };
+            Debug.WriteLine("FFMPEG: " + arguments);
+            var proc = new Process { StartInfo = psi };
+            proc.ErrorDataReceived += (s, ea) =>
+            {
+                if (!string.IsNullOrEmpty(ea.Data)) errBuf.AppendLine(ea.Data);
+            };
+            proc.Start();
+            proc.BeginErrorReadLine();
+            await Task.Run(() => proc.WaitForExit());
+            return proc.ExitCode;
+        }
+
+        private async Task SplitVideoAsync(string filePath, long targetBytes, TimeSpan totalDuration)
+        {
+            double fileBytes = new FileInfo(filePath).Length;
+            double durSecs   = totalDuration.TotalSeconds;
+            var    ic        = System.Globalization.CultureInfo.InvariantCulture;
+
+            // H.264 input (re-encoded export) has frequent keyframes (~2 s) so lossless
+            // splitting is very accurate → use 92 % safety margin.
+            // HEVC/other lossless input has sparse keyframes that can overshoot badly
+            // → use 60 % margin to compensate.
+            double margin      = chkReencode.Checked ? 0.92 : 0.60;
+            double secsPerPart = (targetBytes * margin) / fileBytes * durSecs;
+            int    numParts    = (int)Math.Ceiling(durSecs / secsPerPart);
+
+            string dir  = Path.GetDirectoryName(filePath);
+            string stem = Path.GetFileNameWithoutExtension(filePath);
+            string ext  = Path.GetExtension(filePath);
+
+            progressBarExport.Minimum = 0;
+            progressBarExport.Maximum = numParts;
+            progressBarExport.Value   = 0;
+            progressBarExport.Style   = System.Windows.Forms.ProgressBarStyle.Blocks;
+
+            var ffmpegErr = new System.Text.StringBuilder();
+
+            for (int i = 0; i < numParts; i++)
+            {
+                double startSec = i * secsPerPart;
+                double partSecs = Math.Min(secsPerPart, durSecs - startSec);
+                string partFile = Path.Combine(dir, $"{stem}_part{i + 1:D2}{ext}");
+
+                labelExportProgress.Text = $"SPLITTING  {i + 1} / {numParts}";
+                labelRemainingTime.Text  = "";
+                ffmpegErr.Clear();
+
+                // Always lossless copy — if chkReencode was on the input is already H.264,
+                // so parts are Discord-compatible and sizes are accurate.
+                string args = $"-ss {startSec.ToString("F3", ic)} -i \"{filePath}\" " +
+                              $"-t {partSecs.ToString("F3", ic)} -c copy -map 0 " +
+                              $"-avoid_negative_ts 1 -y \"{partFile}\"";
+
+                int exitCode = await RunFfmpegAsync(args, ffmpegErr);
+                if (exitCode != 0)
+                {
+                    MessageBox.Show($"ffmpeg failed on part {i + 1}:\n\n{ffmpegErr}",
+                        "Split Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                progressBarExport.Value = i + 1;
+            }
+
+            // Remove the single-file source now that it's been split into parts
+            try { File.Delete(filePath); } catch { }
+
+            // Warn about any parts that still exceeded the target
+            var oversize = new List<string>();
+            for (int i = 0; i < numParts; i++)
+            {
+                string pf = Path.Combine(dir, $"{stem}_part{i + 1:D2}{ext}");
+                if (File.Exists(pf) && new FileInfo(pf).Length > targetBytes)
+                    oversize.Add($"  part{i + 1:D2}  ({new FileInfo(pf).Length / 1024 / 1024} MB)");
+            }
+            if (oversize.Count > 0)
+            {
+                string tip = chkReencode.Checked
+                    ? "Unexpected overshoot from H.264 input — the source may have very infrequent keyframes."
+                    : "Tick \"Re-encode to H.264 (Discord)\" for guaranteed sizes and Discord preview.";
+                MessageBox.Show(
+                    $"{oversize.Count} part(s) exceeded the target size:\n\n" +
+                    string.Join("\n", oversize) + $"\n\n{tip}",
+                    "Some Parts Over Limit", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            labelExportProgress.Text = "SPLIT COMPLETE";
+            labelRemainingTime.Text  = $"Split into {numParts} part(s)";
+        }
+
         // ── Fullscreen ────────────────────────────────────────────────────────
         private bool  _isFullscreen;
         private Point _savedVideoLocation;
@@ -617,6 +729,29 @@ namespace RawVideoCutter
             Properties.Settings.Default.Save();
         }
 
+        // ── Quick-access buttons ──────────────────────────────────────────────
+        private void btnOpenExportFolder_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_exportFolderPath) || !Directory.Exists(_exportFolderPath))
+            {
+                MessageBox.Show("No export folder selected yet.", "Open Folder",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            Process.Start("explorer.exe", _exportFolderPath);
+        }
+
+        private void btnOpenLastVideo_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_lastExportedFile) || !File.Exists(_lastExportedFile))
+            {
+                MessageBox.Show("No exported video found.", "Open Last Video",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            Process.Start(new ProcessStartInfo(_lastExportedFile) { UseShellExecute = true });
+        }
+
         // ── Export ────────────────────────────────────────────────────────────
         private async void btnExport_Click(object sender, EventArgs e)
         {
@@ -650,10 +785,19 @@ namespace RawVideoCutter
                 return;
             }
 
-            TimeSpan duration    = end - start;
-            string codecArgs     = extension == ".mp4" ? "-c copy -movflags +faststart" : "-c copy";
-            string arguments     = $"-ss {txtStartTime.Text} -i \"{_inputFilePath}\" " +
-                                   $"-t {duration:hh\\:mm\\:ss} -map 0 {codecArgs} -y \"{outputFile}\"";
+            TimeSpan duration = end - start;
+            string codecArgs;
+            if (chkReencode.Checked)
+            {
+                // H.264 CRF 18 — visually lossless quality, Discord-compatible inline preview
+                codecArgs = "-c:v libx264 -crf 18 -preset veryfast -c:a aac -b:a 128k -movflags +faststart";
+            }
+            else
+            {
+                codecArgs = extension == ".mp4" ? "-c copy -movflags +faststart" : "-c copy";
+            }
+            string arguments = $"-ss {txtStartTime.Text} -i \"{_inputFilePath}\" " +
+                               $"-t {duration:hh\\:mm\\:ss} -map 0:v:0 -map 0:a? {codecArgs} -y \"{outputFile}\"";
 
             Debug.WriteLine("FFMPEG args: " + arguments);
 
@@ -702,11 +846,52 @@ namespace RawVideoCutter
             await Task.Run(() => proc.WaitForExit());
 
             _exportStopwatch.Stop();
-            btnExport.Enabled       = true;
-            progressBarExport.Value = 100;
-            labelRemainingTime.Text = "Done";
+            btnExport.Enabled        = true;
+            progressBarExport.Value  = 100;
+            labelRemainingTime.Text  = "Done";
 
-            MessageBox.Show("Export complete!");
+            // Record for the "Open Last Video" button
+            if (File.Exists(outputFile))
+            {
+                _lastExportedFile        = outputFile;
+                btnOpenLastVideo.Enabled = true;
+            }
+
+            // ── Split into Discord-sized parts if requested ───────────────────
+            if (chkSplitParts.Checked && File.Exists(outputFile))
+            {
+                long fileSize    = new FileInfo(outputFile).Length;
+                long targetBytes = (long)((double)numSplitMB.Value * 1024 * 1024);
+
+                if (fileSize > targetBytes)
+                {
+                    await SplitVideoAsync(outputFile, targetBytes, duration);
+
+                    // Point "Open Last Video" at part 01 (source file was deleted by SplitVideoAsync)
+                    string part1 = Path.Combine(
+                        Path.GetDirectoryName(outputFile),
+                        Path.GetFileNameWithoutExtension(outputFile) + "_part01" + Path.GetExtension(outputFile));
+                    if (File.Exists(part1))
+                    {
+                        _lastExportedFile        = part1;
+                        btnOpenLastVideo.Enabled = true;
+                    }
+
+                    MessageBox.Show(
+                        $"Export complete and split into parts of ≤ {numSplitMB.Value} MB.",
+                        "Export + Split Complete");
+                }
+                else
+                {
+                    labelRemainingTime.Text =
+                        $"File is {fileSize / 1024 / 1024} MB — no split needed";
+                    MessageBox.Show("Export complete! File fits in one part.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Export complete!");
+            }
 
             // ── Auto-advance to next video in list ────────────────────────────
             int curIdx = _folderVideoPaths.IndexOf(_inputFilePath);

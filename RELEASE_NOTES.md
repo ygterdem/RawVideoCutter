@@ -2,6 +2,24 @@
 
 ---
 
+## v1.0.2 — 2026-05-06
+
+### New features
+
+#### Discord upload helper
+- **Split for Discord** — after exporting, automatically splits the clip into parts of any size (default 25 MB for free Discord, 500 MB for Nitro)
+- **Re-encode to H.264 (Discord)** — converts HEVC/H.265 source footage to H.264 so Discord shows an inline video preview instead of a plain file icon; also makes split sizes very accurate since H.264 has frequent keyframes
+- Split and re-encode options are independent: you can re-encode a single clip without splitting, or split a lossless clip without re-encoding
+
+#### Quick-access buttons
+- **📁 Open Folder** — opens the export destination in Windows Explorer with one click
+- **▶ Open Last Video** — opens the most recently exported clip in your default video player; enabled automatically after each export (points at `_part01` when splitting was used)
+
+### Fixed
+- **Split controls overlapping CUT END timebox** — moved the Split / Re-encode row to its own dedicated line below the cut-point controls; no more cramped layout
+
+---
+
 ## v1.0.1 — 2026-04-20
 
 ### Fixed

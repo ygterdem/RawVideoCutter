@@ -53,11 +53,19 @@ namespace RawVideoCutter
             this.labelRemainingTime = new System.Windows.Forms.Label();
             this.progressBarExport = new System.Windows.Forms.ProgressBar();
             this.labelAudioTracks = new System.Windows.Forms.Label();
+            this.chkSplitParts = new System.Windows.Forms.CheckBox();
+            this.numSplitMB = new System.Windows.Forms.NumericUpDown();
+            this.labelSplitUnit = new System.Windows.Forms.Label();
+            this.chkReencode = new System.Windows.Forms.CheckBox();
+            this.btnOpenExportFolder = new System.Windows.Forms.Button();
+            this.btnOpenLastVideo = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panelTitleBar.SuspendLayout();
             this.panelSidebar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videoView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarVolume)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSplitMB)).BeginInit();
             this.SuspendLayout();
             // 
             // panelTitleBar
@@ -497,7 +505,7 @@ namespace RawVideoCutter
             this.labelExportFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelExportFolder.Font = new System.Drawing.Font("Segoe UI", 7.5F, System.Drawing.FontStyle.Bold);
             this.labelExportFolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(120)))), ((int)(((byte)(120)))));
-            this.labelExportFolder.Location = new System.Drawing.Point(304, 732);
+            this.labelExportFolder.Location = new System.Drawing.Point(304, 740);
             this.labelExportFolder.Name = "labelExportFolder";
             this.labelExportFolder.Size = new System.Drawing.Size(80, 14);
             this.labelExportFolder.TabIndex = 29;
@@ -505,16 +513,15 @@ namespace RawVideoCutter
             // 
             // txtExportFolder
             // 
-            this.txtExportFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtExportFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txtExportFolder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(38)))), ((int)(((byte)(38)))), ((int)(((byte)(38)))));
             this.txtExportFolder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtExportFolder.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.txtExportFolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(160)))), ((int)(((byte)(160)))), ((int)(((byte)(160)))));
-            this.txtExportFolder.Location = new System.Drawing.Point(304, 748);
+            this.txtExportFolder.Location = new System.Drawing.Point(304, 756);
             this.txtExportFolder.Name = "txtExportFolder";
             this.txtExportFolder.ReadOnly = true;
-            this.txtExportFolder.Size = new System.Drawing.Size(778, 24);
+            this.txtExportFolder.Size = new System.Drawing.Size(468, 24);
             this.txtExportFolder.TabIndex = 30;
             this.txtExportFolder.Text = "(none — will prompt on export)";
             // 
@@ -526,7 +533,7 @@ namespace RawVideoCutter
             this.btnSelectExportFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSelectExportFolder.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnSelectExportFolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(210)))), ((int)(((byte)(210)))), ((int)(((byte)(210)))));
-            this.btnSelectExportFolder.Location = new System.Drawing.Point(1088, 747);
+            this.btnSelectExportFolder.Location = new System.Drawing.Point(1088, 755);
             this.btnSelectExportFolder.Name = "btnSelectExportFolder";
             this.btnSelectExportFolder.Size = new System.Drawing.Size(182, 25);
             this.btnSelectExportFolder.TabIndex = 31;
@@ -539,7 +546,7 @@ namespace RawVideoCutter
             this.labelExportProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelExportProgress.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
             this.labelExportProgress.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(120)))), ((int)(((byte)(120)))));
-            this.labelExportProgress.Location = new System.Drawing.Point(304, 778);
+            this.labelExportProgress.Location = new System.Drawing.Point(304, 786);
             this.labelExportProgress.Name = "labelExportProgress";
             this.labelExportProgress.Size = new System.Drawing.Size(120, 14);
             this.labelExportProgress.TabIndex = 32;
@@ -550,7 +557,7 @@ namespace RawVideoCutter
             this.labelRemainingTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelRemainingTime.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelRemainingTime.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(155)))), ((int)(((byte)(155)))), ((int)(((byte)(155)))));
-            this.labelRemainingTime.Location = new System.Drawing.Point(1050, 778);
+            this.labelRemainingTime.Location = new System.Drawing.Point(1050, 786);
             this.labelRemainingTime.Name = "labelRemainingTime";
             this.labelRemainingTime.Size = new System.Drawing.Size(220, 14);
             this.labelRemainingTime.TabIndex = 33;
@@ -560,7 +567,7 @@ namespace RawVideoCutter
             // 
             this.progressBarExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBarExport.Location = new System.Drawing.Point(304, 794);
+            this.progressBarExport.Location = new System.Drawing.Point(304, 802);
             this.progressBarExport.Name = "progressBarExport";
             this.progressBarExport.Size = new System.Drawing.Size(966, 14);
             this.progressBarExport.TabIndex = 34;
@@ -573,6 +580,117 @@ namespace RawVideoCutter
             this.labelAudioTracks.TabIndex = 90;
             this.labelAudioTracks.Visible = false;
             // 
+            // chkSplitParts
+            // 
+            this.chkSplitParts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkSplitParts.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.chkSplitParts.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(80)))), ((int)(((byte)(80)))));
+            this.chkSplitParts.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
+            this.chkSplitParts.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chkSplitParts.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.chkSplitParts.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.chkSplitParts.Location = new System.Drawing.Point(304, 720);
+            this.chkSplitParts.Name = "chkSplitParts";
+            this.chkSplitParts.Size = new System.Drawing.Size(130, 20);
+            this.chkSplitParts.TabIndex = 35;
+            this.chkSplitParts.Text = "Split for Discord";
+            this.toolTip1.SetToolTip(this.chkSplitParts, "Split the exported file into parts small enough to upload to Discord");
+            this.chkSplitParts.UseVisualStyleBackColor = false;
+            this.chkSplitParts.CheckedChanged += new System.EventHandler(this.chkSplitParts_CheckedChanged);
+            // 
+            // numSplitMB
+            // 
+            this.numSplitMB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numSplitMB.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.numSplitMB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.numSplitMB.Enabled = false;
+            this.numSplitMB.Font = new System.Drawing.Font("Consolas", 10F);
+            this.numSplitMB.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
+            this.numSplitMB.Location = new System.Drawing.Point(440, 721);
+            this.numSplitMB.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+            this.numSplitMB.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numSplitMB.Name = "numSplitMB";
+            this.numSplitMB.Size = new System.Drawing.Size(62, 23);
+            this.numSplitMB.TabIndex = 36;
+            this.toolTip1.SetToolTip(this.numSplitMB, "Discord free = 25 MB  ·  Nitro = 500 MB");
+            this.numSplitMB.Value = new decimal(new int[] {
+            25,
+            0,
+            0,
+            0});
+            // 
+            // labelSplitUnit
+            // 
+            this.labelSplitUnit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelSplitUnit.Enabled = false;
+            this.labelSplitUnit.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.labelSplitUnit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(130)))), ((int)(((byte)(130)))), ((int)(((byte)(130)))));
+            this.labelSplitUnit.Location = new System.Drawing.Point(508, 723);
+            this.labelSplitUnit.Name = "labelSplitUnit";
+            this.labelSplitUnit.Size = new System.Drawing.Size(52, 16);
+            this.labelSplitUnit.TabIndex = 37;
+            this.labelSplitUnit.Text = "MB / part";
+            // 
+            // chkReencode
+            // 
+            this.chkReencode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkReencode.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.chkReencode.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(80)))), ((int)(((byte)(80)))));
+            this.chkReencode.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
+            this.chkReencode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chkReencode.Font = new System.Drawing.Font("Segoe UI", 8.5F);
+            this.chkReencode.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(200)))), ((int)(((byte)(140)))));
+            this.chkReencode.Location = new System.Drawing.Point(566, 723);
+            this.chkReencode.Name = "chkReencode";
+            this.chkReencode.Size = new System.Drawing.Size(200, 18);
+            this.chkReencode.TabIndex = 38;
+            this.chkReencode.Text = "Re-encode to H.264 (Discord)";
+            this.toolTip1.SetToolTip(this.chkReencode, resources.GetString("chkReencode.ToolTip"));
+            this.chkReencode.UseVisualStyleBackColor = false;
+            // 
+            // btnOpenExportFolder
+            // 
+            this.btnOpenExportFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnOpenExportFolder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
+            this.btnOpenExportFolder.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.btnOpenExportFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnOpenExportFolder.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnOpenExportFolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(190)))), ((int)(((byte)(190)))), ((int)(((byte)(190)))));
+            this.btnOpenExportFolder.Location = new System.Drawing.Point(778, 755);
+            this.btnOpenExportFolder.Name = "btnOpenExportFolder";
+            this.btnOpenExportFolder.Size = new System.Drawing.Size(148, 25);
+            this.btnOpenExportFolder.TabIndex = 39;
+            this.btnOpenExportFolder.Text = "📁  Open Folder";
+            this.toolTip1.SetToolTip(this.btnOpenExportFolder, "Open the export destination folder in Explorer");
+            this.btnOpenExportFolder.UseVisualStyleBackColor = false;
+            this.btnOpenExportFolder.Click += new System.EventHandler(this.btnOpenExportFolder_Click);
+            // 
+            // btnOpenLastVideo
+            // 
+            this.btnOpenLastVideo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnOpenLastVideo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(45)))));
+            this.btnOpenLastVideo.Enabled = false;
+            this.btnOpenLastVideo.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.btnOpenLastVideo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnOpenLastVideo.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnOpenLastVideo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(190)))), ((int)(((byte)(190)))), ((int)(((byte)(190)))));
+            this.btnOpenLastVideo.Location = new System.Drawing.Point(932, 755);
+            this.btnOpenLastVideo.Name = "btnOpenLastVideo";
+            this.btnOpenLastVideo.Size = new System.Drawing.Size(150, 25);
+            this.btnOpenLastVideo.TabIndex = 40;
+            this.btnOpenLastVideo.Text = "▶  Open Last Video";
+            this.toolTip1.SetToolTip(this.btnOpenLastVideo, "Open the last exported clip in your default video player");
+            this.btnOpenLastVideo.UseVisualStyleBackColor = false;
+            this.btnOpenLastVideo.Click += new System.EventHandler(this.btnOpenLastVideo_Click);
+            // 
             // timer1
             // 
             this.timer1.Enabled = true;
@@ -584,7 +702,7 @@ namespace RawVideoCutter
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-            this.ClientSize = new System.Drawing.Size(1280, 812);
+            this.ClientSize = new System.Drawing.Size(1280, 820);
             this.Controls.Add(this.panelTitleBar);
             this.Controls.Add(this.panelSidebar);
             this.Controls.Add(this.panelDivider);
@@ -614,6 +732,12 @@ namespace RawVideoCutter
             this.Controls.Add(this.labelExportProgress);
             this.Controls.Add(this.labelRemainingTime);
             this.Controls.Add(this.progressBarExport);
+            this.Controls.Add(this.chkSplitParts);
+            this.Controls.Add(this.numSplitMB);
+            this.Controls.Add(this.labelSplitUnit);
+            this.Controls.Add(this.chkReencode);
+            this.Controls.Add(this.btnOpenExportFolder);
+            this.Controls.Add(this.btnOpenLastVideo);
             this.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -627,6 +751,7 @@ namespace RawVideoCutter
             this.panelSidebar.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videoView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarVolume)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numSplitMB)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -672,7 +797,14 @@ namespace RawVideoCutter
         private System.Windows.Forms.Button    btnSelectExportFolder;
         private System.Windows.Forms.Label     labelExportProgress;
         private System.Windows.Forms.Label     labelRemainingTime;
-        private System.Windows.Forms.ProgressBar progressBarExport;
-        private System.Windows.Forms.Timer     timer1;
+        private System.Windows.Forms.ProgressBar    progressBarExport;
+        private System.Windows.Forms.CheckBox        chkSplitParts;
+        private System.Windows.Forms.NumericUpDown   numSplitMB;
+        private System.Windows.Forms.Label           labelSplitUnit;
+        private System.Windows.Forms.CheckBox        chkReencode;
+        private System.Windows.Forms.Button          btnOpenExportFolder;
+        private System.Windows.Forms.Button          btnOpenLastVideo;
+        private System.Windows.Forms.ToolTip         toolTip1;
+        private System.Windows.Forms.Timer           timer1;
     }
 }
